@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explore Aether 3D, an interactive browser-based spatial interface and geometry studio.">
+    <title>AETHER 3D - Next-Gen Spatial Intelligence</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"Space Grotesk"', 'monospace'],
+                    },
+                    colors: {
+                        space: {
+                                900: '#101a17',
+                            800: '#1b2825',
+                            700: '#263832',
+                            600: '#435b50',
+                            950: '#0b1210'
+                        },
+                        hyper: {
+                            cyan: '#9ed8b5',
+                            blue: '#78a9a4',
+                            violet: '#d98f75',
+                            pink: '#d98f75'
+                        }
+                    },
+                    boxShadow: {
+                        '3d-btn': '0 5px 0 #263832, 0 12px 22px rgba(158, 216, 181, 0.18)',
+                        '3d-btn-active': '0 2px 0 #263832, 0 5px 12px rgba(158, 216, 181, 0.2)',
+                        'card-depth': '0 20px 40px -15px rgba(0,0,0,0.55), 0 0 20px rgba(120, 169, 164, 0.08)',
+                        'inner-bevel': 'inset 0 1px 1px 0 rgba(255, 255, 255, 0.25), inset 0 -2px 4px 0 rgba(0,0,0,0.5)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body class="bg-space-900 text-slate-100 overflow-x-hidden antialiased selection:bg-hyper-cyan selection:text-space-900 font-sans">
+
+    <!-- Navigation Header -->
+    <header class="fixed top-5 left-0 right-0 z-50 px-4 sm:px-8 max-w-7xl mx-auto">
+        <nav class="glass-3d rounded-2xl px-6 py-3.5 flex items-center justify-between border border-white/10 shadow-2xl">
+            <!-- Brand Logo with 3D Depth -->
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-hyper-violet via-hyper-blue to-hyper-cyan p-[2px] shadow-lg shadow-hyper-cyan/20 group-hover:scale-105 transition-transform duration-300">
+                    <div class="w-full h-full bg-space-900 rounded-[10px] flex items-center justify-center">
+                        <i class="fa-solid fa-cube text-hyper-cyan text-lg transform group-hover:rotate-12 transition-transform duration-300"></i>
+                    </div>
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-mono text-xl font-bold tracking-wider text-white">AETHER<span class="text-hyper-cyan">3D</span></span>
+                    <span class="text-[9px] tracking-widest text-slate-400 font-mono -mt-1 uppercase">Spatial Engine</span>
+                </div>
+            </a>
+
+            <!-- Navigation Links -->
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+                <a href="#features" class="hover:text-hyper-cyan transition-colors">Features</a>
+                <a href="#viewport" class="hover:text-hyper-cyan transition-colors">3D Studio</a>
+                <a href="#architecture" class="hover:text-hyper-cyan transition-colors">Architecture</a>
+                <a href="#pricing" class="hover:text-hyper-cyan transition-colors">Pricing</a>
+            </div>
+
+            <!-- Header Action -->
+            <div class="flex items-center gap-3">
+                <a href="#viewport" class="btn-3d hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-hyper-blue to-hyper-cyan text-space-900 font-bold text-xs uppercase tracking-wider shadow-3d-btn border-t border-white/40">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span>Launch App</span>
+                </a>
+                <button id="mobileMenuBtn" class="md:hidden text-slate-300 hover:text-white p-2" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobileMenu">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Mobile Drawer -->
+        <div id="mobileMenu" class="hidden md:hidden glass-3d mt-3 rounded-2xl p-5 flex flex-col gap-4 text-center">
+            <a href="#features" class="py-2 text-slate-300 hover:text-hyper-cyan">Features</a>
+            <a href="#viewport" class="py-2 text-slate-300 hover:text-hyper-cyan">3D Studio</a>
+            <a href="#architecture" class="py-2 text-slate-300 hover:text-hyper-cyan">Architecture</a>
+            <a href="#pricing" class="py-2 text-slate-300 hover:text-hyper-cyan">Pricing</a>
+            <a href="#viewport" class="btn-3d py-3 rounded-xl bg-hyper-cyan text-space-900 font-bold text-sm">Launch App</a>
+        </div>
+    </header>
+
+    <!-- HERO SECTION with Three.js Interactive 3D Canvas -->
+    <main>
+        <section class="relative min-h-screen pt-36 pb-20 flex items-center overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-8 w-full relative z-10">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    
+                    <!-- Hero Content Left -->
+                    <div class="lg:col-span-6 space-y-8 text-center lg:text-left">
+                        <!-- 3D Badge -->
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-3d text-xs font-mono tracking-wide text-hyper-cyan shadow-inner-bevel">
+                            <span class="w-2 h-2 rounded-full bg-hyper-cyan animate-ping"></span>
+                            <span>v3.4 Spatial Web Architecture Live</span>
+                            <i class="fa-solid fa-chevron-right text-[10px] ml-1 opacity-70"></i>
+                        </div>
+
+                        <!-- Main Headings -->
+                        <h1 class="text-4xl sm:text-6xl xl:text-7xl font-extrabold tracking-tight leading-[1.1]">
+                            <span class="text-gradient-3d block">Dimension Beyond</span>
+                            <span class="text-neon-cyan block mt-1">Screen Limits.</span>
+                        </h1>
+
+                        <p class="text-base sm:text-lg text-slate-400 max-w-xl mx-auto lg:mx-0 font-normal leading-relaxed">
+                            Deploy high-performance interactive 3D interfaces directly to the browser. Real-time rendering, hardware acceleration, and depth UI components for tomorrow's web standards.
+                        </p>
+
+                        <!-- Call To Actions -->
+                        <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+                            <a href="#viewport" class="btn-3d w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-hyper-cyan via-hyper-blue to-hyper-violet text-space-900 font-bold text-sm tracking-wide uppercase shadow-3d-btn border-t border-white/50 flex items-center justify-center gap-3">
+                                <i class="fa-solid fa-cube text-base"></i>
+                                <span>Enter 3D Sandbox</span>
+                            </a>
+                            <a href="#architecture" class="btn-3d w-full sm:w-auto px-7 py-4 rounded-xl glass-3d text-white font-semibold text-sm hover:border-hyper-cyan/40 transition-all flex items-center justify-center gap-3 shadow-lg">
+                                <i class="fa-solid fa-terminal text-hyper-cyan"></i>
+                                <span>Inspect Pipeline</span>
+                            </a>
+                        </div>
+
+                        <!-- Social Proof & Stats with Depth -->
+                        <div class="pt-8 border-t border-white/10 grid grid-cols-3 gap-4 max-w-md mx-auto lg:mx-0">
+                            <div>
+                                <div class="font-mono text-2xl font-bold text-white">60<span class="text-hyper-cyan">FPS</span></div>
+                                <div class="text-xs text-slate-400 font-medium">WebGL Core</div>
+                            </div>
+                            <div>
+                                <div class="font-mono text-2xl font-bold text-white">0.4<span class="text-hyper-blue">ms</span></div>
+                                <div class="text-xs text-slate-400 font-medium">Input Latency</div>
+                            </div>
+                            <div>
+                                <div class="font-mono text-2xl font-bold text-white">100<span class="text-hyper-pink">%</span></div>
+                                <div class="text-xs text-slate-400 font-medium">Responsive</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hero 3D Interactive Canvas & Floating HUD -->
+                    <div class="lg:col-span-6 relative perspective-1000">
+                        <div class="relative w-full aspect-square max-w-[550px] mx-auto">
+                            <!-- 3D Canvas Container with Bevel & Glow -->
+                            <div class="w-full h-full rounded-3xl glass-3d relative overflow-hidden border border-white/15 p-2 shadow-2xl">
+                                <canvas id="hero-canvas" class="w-full h-full rounded-2xl cursor-grab active:cursor-grabbing block"></canvas>
+                                
+                                <!-- Canvas Controls Overlay -->
+                                <div class="absolute bottom-5 left-5 right-5 flex items-center justify-between pointer-events-none">
+                                    <div class="glass-3d px-3 py-1.5 rounded-lg text-[11px] font-mono text-slate-300 pointer-events-auto flex items-center gap-2">
+                                        <i class="fa-solid fa-arrows-up-down-left-right text-hyper-cyan"></i>
+                                        <span>Drag to Rotate | Scroll to Zoom</span>
+                                    </div>
+                                    <button id="resetCameraBtn" class="glass-3d px-3 py-1.5 rounded-lg text-[11px] font-mono text-slate-300 hover:text-hyper-cyan pointer-events-auto transition-colors flex items-center gap-1.5 shadow-sm">
+                                        <i class="fa-solid fa-arrows-rotate"></i> Reset
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Floating 3D HUD Badge 1 -->
+                            <div class="tilt-card absolute -top-5 -left-5 sm:-left-8 glass-3d p-4 rounded-2xl hidden sm:flex items-center gap-3.5 border border-white/20 shadow-card-depth z-20">
+                                <div class="w-10 h-10 rounded-xl bg-hyper-cyan/20 border border-hyper-cyan/40 flex items-center justify-center text-hyper-cyan text-lg">
+                                    <i class="fa-solid fa-microchip"></i>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] uppercase font-mono tracking-wider text-slate-400">Rendering Engine</div>
+                                    <div class="text-xs font-bold text-white">Three.js WebGL2 Shader</div>
+                                </div>
+                            </div>
+
+                            <!-- Floating 3D HUD Badge 2 -->
+                            <div class="tilt-card absolute -bottom-6 -right-4 sm:-right-6 glass-3d p-4 rounded-2xl hidden sm:flex items-center gap-3.5 border border-white/20 shadow-card-depth z-20">
+                                <div class="w-10 h-10 rounded-xl bg-hyper-pink/20 border border-hyper-pink/40 flex items-center justify-center text-hyper-pink text-lg">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] uppercase font-mono tracking-wider text-slate-400">GPU Acceleration</div>
+                                    <div class="text-xs font-bold text-white">Ultra-Low Power Overhead</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 3D INTERACTIVE PLAYGROUND / STUDIO SECTION -->
+        <section id="viewport" class="py-24 relative z-10 border-t border-white/10 bg-space-800/40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-3d text-xs font-mono text-hyper-cyan mb-3">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>Dynamic Geometry Sandbox</span>
+                    </div>
+                    <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+                        Interactive 3D Object Lab
+                    </h2>
+                    <p class="text-slate-400 mt-4 text-base">
+                        Test custom geometries and materials in real time. Switch mesh presets, adjust lighting wireframes, and verify browser performance metrics.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                    <!-- 3D Viewport Controls -->
+                    <div class="lg:col-span-4 flex flex-col justify-between glass-3d rounded-3xl p-6 sm:p-8 border border-white/15 shadow-card-depth">
+                        <div class="space-y-6">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-shapes text-hyper-cyan"></i>
+                                Shape Geometry
+                            </h3>
+
+                            <!-- Mesh Selector Buttons -->
+                            <div class="grid grid-cols-3 gap-2.5">
+                                <button onclick="setStudioGeometry('torusKnot', this)" aria-pressed="true" class="geo-btn active px-3 py-3 rounded-xl glass-3d border border-hyper-cyan text-xs font-mono font-semibold text-hyper-cyan hover:border-hyper-cyan transition-all text-center">
+                                    <i class="fa-solid fa-infinity block text-base mb-1 text-hyper-cyan"></i> Torus
+                                </button>
+                                <button onclick="setStudioGeometry('icosahedron', this)" aria-pressed="false" class="geo-btn px-3 py-3 rounded-xl glass-3d border border-white/15 text-xs font-mono font-semibold text-slate-200 hover:border-hyper-cyan transition-all text-center">
+                                    <i class="fa-solid fa-gem block text-base mb-1 text-hyper-blue"></i> Crystal
+                                </button>
+                                <button onclick="setStudioGeometry('octahedron', this)" aria-pressed="false" class="geo-btn px-3 py-3 rounded-xl glass-3d border border-white/15 text-xs font-mono font-semibold text-slate-200 hover:border-hyper-cyan transition-all text-center">
+                                    <i class="fa-solid fa-dice-d20 block text-base mb-1 text-hyper-pink"></i> Prism
+                                </button>
+                            </div>
+
+                            <!-- Material Render Styles -->
+                            <div class="pt-4 border-t border-white/10">
+                                <label class="text-sm font-bold text-white block mb-3">Shading Pipeline</label>
+                                <div class="flex flex-col gap-2">
+                                    <button onclick="setStudioMaterial('physical', this)" aria-pressed="true" class="mat-btn active px-4 py-2.5 rounded-xl glass-3d border border-hyper-cyan text-xs font-mono text-left flex items-center justify-between text-white hover:border-hyper-cyan transition-all">
+                                        <span>Iridescent Glass</span>
+                                        <i class="fa-solid fa-check text-hyper-cyan"></i>
+                                    </button>
+                                    <button onclick="setStudioMaterial('wireframe', this)" aria-pressed="false" class="mat-btn px-4 py-2.5 rounded-xl glass-3d border border-white/10 text-xs font-mono text-left flex items-center justify-between text-slate-300 hover:border-hyper-cyan transition-all">
+                                        <span>Cyber Hologram Wireframe</span>
+                                        <i class="fa-solid fa-check text-hyper-cyan hidden"></i>
+                                    </button>
+                                    <button onclick="setStudioMaterial('chrome', this)" aria-pressed="false" class="mat-btn px-4 py-2.5 rounded-xl glass-3d border border-white/10 text-xs font-mono text-left flex items-center justify-between text-slate-300 hover:border-hyper-cyan transition-all">
+                                        <span>Mirror Liquid Chrome</span>
+                                        <i class="fa-solid fa-check text-hyper-cyan hidden"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Rotation Speed Slider -->
+                            <div class="pt-4 border-t border-white/10">
+                                <div class="flex justify-between text-xs font-mono text-slate-300 mb-2">
+                                    <span>Vorticity Speed</span>
+                                    <span id="speedVal" class="text-hyper-cyan">1.0x</span>
+                                </div>
+                                <input id="speedSlider" type="range" min="0" max="3" step="0.1" value="1" class="w-full h-1.5 bg-space-700 rounded-lg appearance-none cursor-pointer accent-hyper-cyan">
+                            </div>
+                        </div>
+
+                        <!-- Status Console -->
+                        <div class="mt-8 pt-4 border-t border-white/10 bg-space-900/60 rounded-xl p-3 font-mono text-[11px] text-slate-400 space-y-1">
+                            <div class="flex justify-between">
+                                <span>Draw Calls:</span>
+                                <span class="text-emerald-400">1 (Batched)</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Geometry Polycount:</span>
+                                <span id="polyCount" class="text-slate-200">12,480 Tris</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Shading Engine:</span>
+                                <span class="text-hyper-cyan">PBR Physical Standard</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3D Studio Canvas Viewport -->
+                    <div class="lg:col-span-8 glass-3d rounded-3xl p-3 relative border border-white/15 shadow-2xl min-h-[460px] flex flex-col">
+                        <div class="absolute top-6 left-6 z-20 flex items-center gap-2">
+                            <div class="px-3 py-1 rounded-full bg-space-900/80 border border-white/15 text-[11px] font-mono text-white flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                <span>WEBGL2 CANVAS READY</span>
+                            </div>
+                        </div>
+
+                        <canvas id="studio-canvas" class="w-full flex-1 rounded-2xl cursor-grab active:cursor-grabbing block"></canvas>
+                        
+                        <div class="p-3 bg-space-900/40 rounded-xl mt-3 flex items-center justify-between text-xs text-slate-400 font-mono">
+                            <span><i class="fa-solid fa-hand-pointer mr-1.5 text-hyper-cyan"></i>Click & drag freely inside scene to test physics inertia</span>
+                            <span class="hidden sm:inline text-slate-500">60 FPS Locked</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3D TILT CARDS / CORE FEATURES -->
+        <section id="features" class="py-28 relative z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-20">
+                    <span class="text-xs font-mono font-bold tracking-widest text-hyper-cyan uppercase">Sculpted For Immersion</span>
+                    <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mt-2">
+                        Features with Physical Presence
+                    </h2>
+                    <p class="text-slate-400 mt-4 text-base">
+                        Move your mouse across the cards to feel real reactive depth, spatial lighting reflections, and hardware-accelerated 3D elevation.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 perspective-1000">
+                    <!-- Feature Card 1 -->
+                    <div class="tilt-card glass-3d rounded-3xl p-8 border border-white/15 relative group cursor-pointer hover:border-hyper-cyan/50">
+                        <div class="w-14 h-14 rounded-2xl bg-hyper-cyan/15 border border-hyper-cyan/30 flex items-center justify-center text-hyper-cyan text-2xl mb-6 shadow-inner-bevel tilt-element-z">
+                            <i class="fa-solid fa-cube"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3 group-hover:text-hyper-cyan transition-colors tilt-element-z">
+                            Parametric Spatial Meshes
+                        </h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6 tilt-element-z">
+                            Dynamically generate, subdivide, and deform 3D models directly on runtime threads with zero asset download bottleneck.
+                        </p>
+                        <div class="flex items-center text-xs font-mono text-hyper-cyan font-bold tracking-wider group-hover:translate-x-1.5 transition-transform tilt-element-z">
+                            <span>EXPLORE PIPELINE</span>
+                            <i class="fa-solid fa-arrow-right ml-2 text-[10px]"></i>
+                        </div>
+                    </div>
+
+                    <!-- Feature Card 2 -->
+                    <div class="tilt-card glass-3d rounded-3xl p-8 border border-white/15 relative group cursor-pointer hover:border-hyper-blue/50">
+                        <div class="w-14 h-14 rounded-2xl bg-hyper-blue/15 border border-hyper-blue/30 flex items-center justify-center text-hyper-blue text-2xl mb-6 shadow-inner-bevel tilt-element-z">
+                            <i class="fa-solid fa-lightbulb"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3 group-hover:text-hyper-blue transition-colors tilt-element-z">
+                            Physically-Based Lighting
+                        </h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6 tilt-element-z">
+                            Multi-source rim lighting, ambient occlusion maps, and specular roughness computed instantaneously on client GPUs.
+                        </p>
+                        <div class="flex items-center text-xs font-mono text-hyper-blue font-bold tracking-wider group-hover:translate-x-1.5 transition-transform tilt-element-z">
+                            <span>SHADING BENCHMARKS</span>
+                            <i class="fa-solid fa-arrow-right ml-2 text-[10px]"></i>
+                        </div>
+                    </div>
+
+                    <!-- Feature Card 3 -->
+                    <div class="tilt-card glass-3d rounded-3xl p-8 border border-white/15 relative group cursor-pointer hover:border-hyper-pink/50">
+                        <div class="w-14 h-14 rounded-2xl bg-hyper-pink/15 border border-hyper-pink/30 flex items-center justify-center text-hyper-pink text-2xl mb-6 shadow-inner-bevel tilt-element-z">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3 group-hover:text-hyper-pink transition-colors tilt-element-z">
+                            Layered CSS-Z Coordinates
+                        </h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6 tilt-element-z">
+                            Seamlessly combine native HTML elements with 3D canvas coordinates using matrix transforms and unified camera planes.
+                        </p>
+                        <div class="flex items-center text-xs font-mono text-hyper-pink font-bold tracking-wider group-hover:translate-x-1.5 transition-transform tilt-element-z">
+                            <span>VIEW INTEGRATION</span>
+                            <i class="fa-solid fa-arrow-right ml-2 text-[10px]"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ARCHITECTURAL PIPELINE (Interactive 3D Isometric Steps) -->
+        <section id="architecture" class="py-24 relative z-10 border-t border-white/10 bg-space-950/70">
+            <div class="max-w-7xl mx-auto px-4 sm:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-20">
+                    <span class="text-xs font-mono font-bold tracking-widest text-hyper-blue uppercase">Zero Setup Pipeline</span>
+                    <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mt-2">
+                        How AETHER 3D Deploys
+                    </h2>
+                    <p class="text-slate-400 mt-4 text-base">
+                        Ship production 3D web applications with zero dependencies and extreme performance.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+                    <!-- Connector line behind cards on desktop -->
+                    <div class="hidden md:block absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-hyper-cyan via-hyper-blue to-hyper-pink transform -translate-y-1/2 z-0 opacity-20"></div>
+
+                    <!-- Step 1 -->
+                    <div class="relative z-10 glass-3d rounded-3xl p-8 border border-white/15 shadow-card-depth flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-6">
+                                <span class="text-3xl font-black font-mono text-white/20">01</span>
+                                <div class="w-10 h-10 rounded-xl bg-hyper-cyan/20 border border-hyper-cyan/40 flex items-center justify-center text-hyper-cyan">
+                                    <i class="fa-solid fa-code"></i>
+                                </div>
+                            </div>
+                            <h4 class="text-lg font-bold text-white mb-2">Embed Engine Script</h4>
+                            <p class="text-slate-400 text-sm leading-relaxed">
+                                Single lightweight tag delivery with fallback canvas detection and hardware capabilities auto-scaling.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-white/10 font-mono text-[11px] text-hyper-cyan">
+                            &lt;script src="aether.min.js"&gt;
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="relative z-10 glass-3d rounded-3xl p-8 border border-white/20 shadow-card-depth flex flex-col justify-between transform md:-translate-y-3">
+                        <div class="absolute -top-3.5 left-1/2 transform -translate-x-1/2 px-3 py-0.5 rounded-full bg-hyper-blue text-[10px] font-mono font-bold text-space-900 tracking-wider">
+                            AUTOMATIC PIPELINE
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between mb-6">
+                                <span class="text-3xl font-black font-mono text-white/20">02</span>
+                                <div class="w-10 h-10 rounded-xl bg-hyper-blue/20 border border-hyper-blue/40 flex items-center justify-center text-hyper-blue">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                </div>
+                            </div>
+                            <h4 class="text-lg font-bold text-white mb-2">Declare 3D Viewports</h4>
+                            <p class="text-slate-400 text-sm leading-relaxed">
+                                Assign data-aether attributes to standard HTML DOM elements for instant tilt, parallax, and WebGL binding.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-white/10 font-mono text-[11px] text-hyper-blue">
+                            data-spatial-depth="1.2"
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="relative z-10 glass-3d rounded-3xl p-8 border border-white/15 shadow-card-depth flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-6">
+                                <span class="text-3xl font-black font-mono text-white/20">03</span>
+                                <div class="w-10 h-10 rounded-xl bg-hyper-pink/20 border border-hyper-pink/40 flex items-center justify-center text-hyper-pink">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                </div>
+                            </div>
+                            <h4 class="text-lg font-bold text-white mb-2">Deploy Edge Binary</h4>
+                            <p class="text-slate-400 text-sm leading-relaxed">
+                                Self-contained HTML package renders identically across macOS, Windows, iOS Safari, and Android Chrome.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-white/10 font-mono text-[11px] text-hyper-pink">
+                            READY FOR VERCEL / NETLIFY
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3D ELEVATED PRICING -->
+        <section id="pricing" class="py-28 relative z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-20">
+                    <span class="text-xs font-mono font-bold tracking-widest text-hyper-pink uppercase">Production Access</span>
+                    <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mt-2">
+                        Transparent Licences
+                    </h2>
+                    <p class="text-slate-400 mt-4 text-base">
+                        Start crafting high-elevation 3D experiences with full commercial rights.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center max-w-5xl mx-auto perspective-1000">
+                    <!-- Starter Plan -->
+                    <div class="tilt-card glass-3d rounded-3xl p-8 border border-white/10 shadow-lg">
+                        <h4 class="text-lg font-bold text-white mb-1">Indie Developer</h4>
+                        <p class="text-xs text-slate-400 mb-6 font-mono">For creative prototypes & portfolios</p>
+                        <div class="flex items-baseline gap-1 mb-6">
+                            <span class="text-4xl font-extrabold text-white font-mono">$0</span>
+                            <span class="text-xs text-slate-400">/ forever free</span>
+                        </div>
+                        <ul class="space-y-3 text-sm text-slate-300 mb-8 font-normal">
+                            <li class="flex items-center gap-2.5"><i class="fa-solid fa-check text-hyper-cyan text-xs"></i> All standard 3D primitives</li>
+                            <li class="flex items-center gap-2.5"><i class="fa-solid fa-check text-hyper-cyan text-xs"></i> 3D CSS Card tilt library</li>
+                            <li class="flex items-center gap-2.5"><i class="fa-solid fa-check text-hyper-cyan text-xs"></i> Up to 60fps WebGL canvas</li>
+                            <li class="flex items-center gap-2.5 text-slate-500"><i class="fa-solid fa-xmark text-xs"></i> Custom PBR shaders</li>
+                        </ul>
+                        <button class="w-full py-3.5 rounded-xl glass-3d border border-white/20 text-white font-bold text-xs uppercase tracking-wider hover:border-hyper-cyan transition-all">
+                            Clone Starter
+                        </button>
+                    </div>
+
+                    <!-- Pro Plan (Elevated 3D Pop Out) -->
+                    <div class="tilt-card glass-3d rounded-3xl p-8 sm:p-10 border-2 border-hyper-cyan/60 shadow-card-depth relative bg-gradient-to-b from-space-800/80 to-space-900/90 transform lg:-translate-y-4">
+                        <div class="absolute -top-3.5 left-1/2 transform -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-hyper-cyan to-hyper-blue text-[11px] font-mono font-bold text-space-900 shadow-md">
+                            MOST POPULAR
+                        </div>
+                        <h4 class="text-xl font-bold text-white mb-1">Spatial Pro</h4>
+                        <p class="text-xs text-hyper-cyan mb-6 font-mono">For commercial client web apps</p>
+                        <div class="flex items-baseline gap-1 mb-6">
+                            <span class="text-5xl font-extrabold text-white font-mono">$49</span>
+                            <span class="text-xs text-slate-400">/ single deployment</span>
+                        </div>
+                        <ul class="space-y-3.5 text-sm text-slate-200 mb-8">
+                            <li class="flex items-center gap-2.5"><i class="fa-solid fa-check text-hyper-cyan text-xs"></i> Complete Three.js scene presets</li>
+                            <li class="flex items-center gap-2.5"><i class="fa-solid fa-check text-hyper-cyan text-xs"></i> Custom GLSL shader injection</li>
+                            <li class="flex items-center gap-2.5"><i class="fa-solid fa-check text-hyper-cyan text-xs"></i> Unlimited commercial deployments</li>
+                            <li class="flex items-center gap-2.5"><i class="fa-solid fa-check text-hyper-cyan text-xs"></i> Hardware optimization toolkit</li>
+                        </ul>
+                        <button class="btn-3d w-full py-4 rounded-xl bg-gradient-to-r from-hyper-cyan to-hyper-blue text-space-900 font-extrabold text-xs uppercase tracking-wider shadow-3d-btn border-t border-white/40">
+                            Deploy With Pro
+                        </button>
+                    </div>
+
+                    <!-- Enterprise Plan -->
+                    <div class="tilt-card glass-3d rounded-3xl p-8 border border-white/10 shadow-lg">
+                        <h4 class="text-lg font-bold text-white mb-1">Studio Enterprise</h4>
+                        <p class="text-xs text-slate-400 mb-6 font-mono">For scale & high-traffic platforms</p>
+                        <div class="flex items-baseline gap-1 mb-6">
+                            <span class="text-4xl font-extrabold text-white font-mono">$199</span>
+                            <span class="text-xs text-slate-400">/ team license</span>
+                        </div>
+                        <ul class="space-y-3 text-sm text-slate-300 mb-8 font-normal">
+                            <li class="flex items-center gap-2.5"><i class="fa-solid fa-check text-hyper-pink text-xs"></i> Dedicated GPU shader engineering</li>
+                            <li class="flex items-center gap-2.5"><i class="fa-solid fa-check text-hyper-pink text-xs"></i> Custom 3D asset compression</li>
+                            <li class="flex items-center gap-2.5"><i class="fa-solid fa-check text-hyper-pink text-xs"></i> Priority WebGL2 integration</li>
+                            <li class="flex items-center gap-2.5"><i class="fa-solid fa-check text-hyper-pink text-xs"></i> 24/7 Deployment support</li>
+                        </ul>
+                        <button class="w-full py-3.5 rounded-xl glass-3d border border-white/20 text-white font-bold text-xs uppercase tracking-wider hover:border-hyper-pink transition-all">
+                            Contact Engineering
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA BANNER -->
+        <section class="py-20 relative z-10 px-4 sm:px-8">
+            <div class="max-w-6xl mx-auto glass-3d rounded-3xl p-8 sm:p-14 border border-white/20 shadow-2xl relative overflow-hidden text-center">
+                <div class="relative z-10 max-w-2xl mx-auto space-y-6">
+                    <h3 class="text-3xl sm:text-5xl font-black text-white tracking-tight">
+                        Ready To Break The Flat Web?
+                    </h3>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                        This document is a single standalone HTML package. Host it directly on GitHub Pages, Vercel, Netlify, or your private cloud with zero build step required.
+                    </p>
+                    <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="btn-3d w-full sm:w-auto px-8 py-4 rounded-xl bg-hyper-cyan text-space-900 font-bold text-xs uppercase tracking-wider shadow-3d-btn border-t border-white/50">
+                            <i class="fa-solid fa-arrow-up mr-2"></i> Back To Top
+                        </button>
+                        <a href="https://github.com" target="_blank" class="w-full sm:w-auto px-7 py-4 rounded-xl glass-3d text-white font-semibold text-xs uppercase tracking-wider hover:border-hyper-cyan/40 transition-all flex items-center justify-center gap-2">
+                            <i class="fa-brands fa-github text-base"></i> View Documentation
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-white/10 bg-space-900/90 py-12 relative z-10 text-slate-400 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-hyper-cyan/20 border border-hyper-cyan/40 flex items-center justify-center text-hyper-cyan font-bold font-mono">
+                    3D
+                </div>
+                <span class="font-mono text-slate-300 font-bold tracking-wider">AETHER<span class="text-hyper-cyan">3D</span> ENGINE</span>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <a href="#features" class="hover:text-white transition-colors">Features</a>
+                <a href="#viewport" class="hover:text-white transition-colors">Studio</a>
+                <a href="#pricing" class="hover:text-white transition-colors">Licensing</a>
+                <a href="#" class="hover:text-white transition-colors">Privacy</a>
+            </div>
+
+            <div class="font-mono text-slate-500">
+                &copy; <span id="currentYear"></span> Aether 3D Systems. Deployable Web Architecture.
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js" defer></script>
+</body>
+</html>
